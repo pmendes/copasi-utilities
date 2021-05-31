@@ -1,2 +1,2 @@
 # copasi-utilities
-assorted files that are used to work with COPASI
+This repository contains assorted files that are used to work with COPASI. I wrote these files to aid in my own work and make them available for anyone else to use/modify.
