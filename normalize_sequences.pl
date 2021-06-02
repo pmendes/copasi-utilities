@@ -8,7 +8,7 @@
 # Normalizes irregularly spaced sequences of data to regularly spaced 
 # sequences with a specified interval. This is primarily intended for 
 # files written by COPASI in Parameter Estimation or Optimization 
-# tasks where the software only outputs a data point where there is
+# tasks where the software only outputs a data point when there is
 # an improvement of the optimization task. This results in files 
 # that have irregular spacings in terms of function evaluations.
 # This script processes those files and outputs a corresponding file
