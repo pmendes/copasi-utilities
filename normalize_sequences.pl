@@ -2,8 +2,11 @@
 #
 # normalize_sequences.pl inputfile {-v} {interval {final}}
 #
-# normalize irregularly spaced sequences to regularly spaced 
-# sequences at a specified interval. This is primarily intended for 
+# Written by Pedro Mendes, May 2021. Published under MIT License.
+# https://raw.githubusercontent.com/pmendes/copasi-utilities/main/LICENSE
+#
+# Normalizes irregularly spaced sequences of data to regularly spaced 
+# sequences with a specified interval. This is primarily intended for 
 # files written by COPASI in Parameter Estimation or Optimization 
 # tasks where the software only outputs a data point where there is
 # an improvement of the optimization task. This results in files 
