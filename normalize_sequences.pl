@@ -2,7 +2,8 @@
 #
 # normalize_sequences.pl inputfile {-v} {interval {final}}
 #
-# Written by Pedro Mendes, May 2021. Published under MIT License.
+# Written by Pedro Mendes <mendes@copasi.org>, May 2021. 
+# Published under MIT License.
 # https://raw.githubusercontent.com/pmendes/copasi-utilities/main/LICENSE
 #
 # Normalizes irregularly spaced sequences of data to regularly spaced 

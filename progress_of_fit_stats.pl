@@ -2,7 +2,8 @@
 #
 # progress_of_fit_stats.pl inputfile
 #
-# Written by Pedro Mendes, May 2021. Published under MIT License.
+# Written by Pedro Mendes <mendes@copasi.org>, May 2021. 
+# Published under MIT License.
 # https://raw.githubusercontent.com/pmendes/copasi-utilities/main/LICENSE
 #
 # Calculates statistics for objective function values in normalized COPASI 
