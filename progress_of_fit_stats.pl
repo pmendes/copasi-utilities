@@ -101,6 +101,7 @@ while( <IFILE> )
   # remember its value until next line
   $lastline = $1;
   $count[$n] ++;
+#  print("n=$n; top=$top; rep=$replicate; val=$2; mean=$mean[$n]; count=$count[$n]; min=$minval[$n]; max=$maxval[$n]\n"); 
   $delta = $2 - $mean[$n];
   $mean[$n] += $delta / $count[$n];
   $delta2 = $2 - $mean[$n];
@@ -111,6 +112,7 @@ while( <IFILE> )
  }
 }
 
+#print("\ntop=$top\n"); 
 # write out all the stats
 print( O1FILE "#fevals\tMean\tStd dev\tN\tMin\tMax\n");
 for( $n=0; $n < $top; $n++ )
