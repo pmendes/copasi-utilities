@@ -112,6 +112,7 @@ $ordinal = 0; # counter for current sequence
 $lastprinted = 0; # last sequence counter seen
 $lastrest = ""; # last rest of line seen
 $lastread = 0; #last line read
+$lastblank=0; #1 if last line printed was blank
 
 while( <IFILE> ) 
 {
@@ -125,35 +126,52 @@ while( <IFILE> )
   # first we check if the new value is smaller than the last one
   # and if the last printed is smaller than the last read; because
   # in that case we still need to print the last value 
-  if( $ordinal<$lastprinted && $lastprinted < $lastread)
+  if( $ordinal<=$lastprinted && $lastprinted < $lastread)
   {
    # we print the last one read in the corresponding interval
    $i = $lastprinted + $interval;
    print( O1FILE "$i$lastrest\n");
-   if( $verbose) {print "printing $i with value $lastread\n";}
+   if( $verbose) {print "printing $i with value $lastread (1)\n";}
+   $lastblank = 0;
    $lastprinted = $i;
   }  
   
   # check if we are in a new sequence and if we still need to print
   # the last sequence until the final line requested
-  if( $ordinal<$lastread && $final>$lastprinted )
+  if( $ordinal<=$lastread && $final>$lastprinted )
   {
    for($i = $lastprinted+$interval; $i <= $final; $i+=$interval)
    {
     print( O1FILE "$i$lastrest\n");
-    if( $verbose) {print "printing $i with value $ordinal\n";}
+    if( $verbose) {print "printing $i with value $lastread (2)\n";}
+    $lastblank = 0;
     $lastprinted = $i;
    }
+   if( $lastblank != 1 ) 
+   { 
+    print( O1FILE "\n");
+    $lastblank = 1;
+   }
   }
+#  else
+#  {
+#   # if we did not have to print more, than we still need to print the blank line
+#   if( $lastblank != 1 ) 
+#   { 
+#    print( O1FILE "\n");
+#    $lastblank = 1;
+#   }
+#  }
  
   # if $ordinal is the start of the sequence let's process it now
-  if( $ordinal==1 || $ordinal<$lastread )
+  if( $ordinal==1 || $ordinal<=$lastread )
   {
    # print as many intervals as needed until reaching $ordinal
    for($i = 1; $i <= $ordinal; $i+=$interval)
    {
     print( O1FILE "$i$rest\n");
-    if( $verbose) {print "printing $i with value $ordinal\n";}
+    if( $verbose) {print "printing $i with value $ordinal (3)\n";}
+    $lastblank = 0;
     $lastprinted = $i;
    }
    $lastrest = $rest;
@@ -173,7 +191,8 @@ while( <IFILE> )
    {
     # exact step size as requested, write out this line as is
     print( O1FILE "$_");
-    if( $verbose) {print "printing $ordinal with value $ordinal\n";}
+    if( $verbose) {print "printing $ordinal with value $ordinal (4)\n";}
+    $lastblank = 0;
     $lastprinted = $ordinal;
     $lastread = $ordinal;
     $lastrest = $rest;
@@ -184,7 +203,8 @@ while( <IFILE> )
     for($i = $lastprinted + $interval; $i < $ordinal; $i+=$interval)
     {
      print( O1FILE "$i$lastrest\n");
-     if( $verbose) {print "printing $i with value $lastread\n";} 
+     if( $verbose) {print "printing $i with value $lastread (5)\n";} 
+     $lastblank = 0;
      $lastprinted = $i;
     }
     $lastrest = $rest;
@@ -194,7 +214,8 @@ while( <IFILE> )
     {
      # exact step size as requested, write out this line as is
      print( O1FILE "$_");
-     if( $verbose) {print "printing $ordinal with value $ordinal\n";}
+     if( $verbose) {print "printing $ordinal with value $ordinal (6)\n";}
+     $lastblank = 0;
      $lastprinted = $ordinal;
     }
    }
@@ -210,23 +231,38 @@ while( <IFILE> )
    # we print the last one read in the corresponding interval
    $i = $lastprinted + $interval;
    print( O1FILE "$i$lastrest\n");
-   if( $verbose) {print "printing $i with value $lastread\n";}
+   if( $verbose) {print "printing $i with value $lastread (7)\n";}
    $lastprinted = $i;
+   $lastblank = 0;
   }
-  # now it this line is empty it signals the end of a sequence 
+  # now if this line is empty it signals the end of a sequence 
   # so if needeed, let's print it until the end
   if( !/\S/ && $final>$lastprinted )
   {
    for($i = $lastprinted+$interval; $i <= $final; $i+=$interval)
    {
     print( O1FILE "$i$lastrest\n");
-    if( $verbose) {print "printing $i with value $lastread\n";}
+    if( $verbose) {print "printing $i with value $lastread (8)\n";}
+    $lastblank = 0;
     $lastprinted = $i;
    }
   }
   # finally we just print the line as it came in
-  print( O1FILE "$_");
-  if( $verbose>1) {print "printing non-numeric line\n";}
+  if( !/\S/ ) 
+  {
+   if( $lastblank != 1 )
+   {
+    if( $verbose>1) {print "printing non-numeric line\n";}
+    print( O1FILE "$_");
+    $lastblank = 1; 
+   }
+  }
+  else
+  {
+   if( $verbose>1) {print "printing non-numeric line\n";}
+   print( O1FILE "$_");
+   $lastblank = 0; 
+  }
  }
 }
 
@@ -238,7 +274,8 @@ if( $lastprinted < $lastread)
  # we print the last one read in the corresponding interval
  $i = $lastprinted + $interval;
  print( O1FILE "$i$lastrest\n");
- if( $verbose) {print "printing $i with value $lastread\n";}
+ if( $verbose) {print "printing $i with value $lastread (9)\n";}
+ $lastblank = 0;
  $lastprinted = $i;
 }
 
@@ -248,7 +285,8 @@ if( $final>$lastprinted )
  for($i = $lastprinted+$interval; $i <= $final; $i+=$interval)
  {
   print( O1FILE "$i$lastrest\n");
-  if( $verbose) {print "printing $i with value $lastread\n";}
+  if( $verbose) {print "printing $i with value $lastread (10)\n";}
+  $lastblank = 0;
   $lastprinted = $i;
  }
 }  
