@@ -22,6 +22,7 @@
 # (first column of input file). The statistics calculated are:
 #  Mean value
 #  Standard deviation
+#  Coefficient of variation (CV)
 #  Number of samples
 #  Minimum value
 #  Maximum value
