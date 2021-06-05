@@ -118,7 +118,7 @@ print( O1FILE "#fevals\tMean\tStd dev\tCV\tN\tMin\tMax\n");
 for( $n=0; $n < $top; $n++ )
 {
  $stdev = sqrt($m2[$n] / $count[$n]);
- $cv = $stdev / $mean[$n]
+ $cv = $stdev / $mean[$n];
  print( O1FILE "$iter[$n]\t$mean[$n]\t$stdev\t$cv\t$count[$n]\t$minval[$n]\t$maxval[$n]\n");
 }
 
