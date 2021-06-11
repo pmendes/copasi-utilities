@@ -34,6 +34,7 @@
 #  input: basename.norm.tsv  output: basename.norm.stats.tsv   
 
 use POSIX;
+use Scalar::Util qw(looks_like_number);
 
 if( $#ARGV < 0 ) { die "usage: progress_of_fit_stats.pl inputfile\n"; }
 $in = $ARGV[0];
@@ -87,22 +88,20 @@ while( <IFILE> )
    # increment replicate count
    $replicate++;
   }
-  if( $replicate == 0 )
+  # store the iteration number 
+  $iter[$n] = $1;
+  # remember its value until next line
+  $lastline = $1;
+  # check if $mean[$n] is empty and prepare counters and accumulators if so
+  if( ! looks_like_number($mean[$n]) )
   {
-   # this only executes on the first replicate sequence
-   # initialize counters and accumulators
    $count[$n] = 0;
    $mean[$n] = 0.0;
    $m2[$n] = 0.0;
    $minval[$n] = POSIX::FLT_MAX;
    $maxval[$n] = 0.0; # ssq is always positive...
   }
-  # store the iteration number 
-  $iter[$n] = $1;
-  # remember its value until next line
-  $lastline = $1;
   $count[$n] ++;
-#  print("n=$n; top=$top; rep=$replicate; val=$2; mean=$mean[$n]; count=$count[$n]; min=$minval[$n]; max=$maxval[$n]\n"); 
   $delta = $2 - $mean[$n];
   $mean[$n] += $delta / $count[$n];
   $delta2 = $2 - $mean[$n];
