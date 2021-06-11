@@ -34,7 +34,7 @@
 # ADJUSTABLE PARAMETERS
 
 # cpsexec is the command line to call CopasiSE, adjust paths and options
-cpsexec="/usr/local/copasi-dev/bin/CopasiSE -c /usr/share/copasi --nologo "
+cpsexec="/usr/local/copasi-dev/bin/CopasiSE -c /usr/share/copasi --nologo --report-file "
 
 # default values for interval and final
 interval=500
@@ -73,13 +73,6 @@ if [ $# -gt 4 ]
    final=$5;
 fi
 
-# check whether the COPASI file has any mention of "pe_out.tsv"
-# note that this is not a full-proof test, it basically just greps the filename
-if ! grep -s -q "target=\"pe_out.tsv\"" $1.cps; then
-   echo "ERROR: COPASI file $1.cps does not output to a report \"pe_out.tsv\" in this directory";
-   exit 5
-fi
-
 # do we have the other scripts here?
 if ! [ -x normalize_sequences.pl ] ; then
    echo "ERROR: required script \"normalize_sequences.pl\" missing or not executable";
@@ -92,15 +85,15 @@ fi
 
 # DO THE WORK
 
+# remove previous report file if one was there
+rm "$1_$3.tsv" > /dev/null 2>&1
+
 # run all the iterations
 echo "Running $1.cps $2 iterations"
 for (( i=0; i<$2; i++ ))
 do
- $cpsexec "$1.cps"
+ $cpsexec "$1_$3.tsv" "$1.cps"
 done
-
-# rename the report file
-mv pe_out.tsv $1_$3.tsv
 
 # normalize the output to a regular grid of fevals
 echo "Normalizing sequences to $1_$3.norm.tsv"
