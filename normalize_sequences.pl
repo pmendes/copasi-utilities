@@ -122,6 +122,13 @@ while( <IFILE> )
   $ordinal = $1;
   if( $verbose) {print "reading $ordinal\n";}
   $rest = $2;
+  # see if we got past the requested final
+  if( $ordinal > $final )
+  {
+   # we don't want to print any data past $final so skip this line
+   if( $verbose) {print "skipping $ordinal (larger than $final)\n";}
+   next;
+  }
 
   # first we check if the new value is smaller than the last one
   # and if the last printed is smaller than the last read; because
@@ -153,15 +160,6 @@ while( <IFILE> )
     $lastblank = 1;
    }
   }
-#  else
-#  {
-#   # if we did not have to print more, than we still need to print the blank line
-#   if( $lastblank != 1 ) 
-#   { 
-#    print( O1FILE "\n");
-#    $lastblank = 1;
-#   }
-#  }
  
   # if $ordinal is the start of the sequence let's process it now
   if( $ordinal==1 || $ordinal<=$lastread )
