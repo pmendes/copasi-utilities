@@ -12,6 +12,10 @@ COPASISE=/usr/local/COPASI-DEVEL/bin/CopasiSE
 # COPASI options
 CLOPT="--nologo"
 
+# time between samples. Set -1 for automatic value (likely to be 0.02).
+# cannot be smaller than kernel clock tick rate (2 * 1/100 on most systems)
+DELTA=0.1
+
 # default number of iterations
 RUNITER=20
 
@@ -95,7 +99,7 @@ for ((i=1;i<=$RUNITER;i++));
 do
 #   printf "# " >> $OUTFILE
    printf '%s ' "$i"
-   ! audria -d 0.1 -o $OUTFILE -e $COPASISE $CLOPT $INFILE 2>&1 > /dev/null
+   ! audria -d $DELTA -o $OUTFILE -e $COPASISE $CLOPT $INFILE 2>&1 > /dev/null
    printf "\n" >> $OUTFILE
 done
 
