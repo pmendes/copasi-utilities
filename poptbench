@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# script to benchmark COPASI's parallel optimization
+# make sure that the .cps files passed on to this script are set
+# executable for parameter estimation or optimization and that the
+# correct optimization algorithm is selected
+
+# PARAMETERS (edit as needed)
+
+# the executable with serial algorithm
+OPTSER=/usr/bin/CopasiSE
+
+# the executable with parallel algorithm
+OPTPAR=/usr/local/COPASI-DEVEL/bin/CopasiSE
+
+# CopasiSE options
+CLOPT="--nologo"
+
+# default number of iterations
+RUNITER=20
+
+# default number of threads
+THREADS=4
+
+#DON'T EDIT BELOW THIS LINE
+
+# check command line options
+if [[ $# -ge 1 ]]; then
+  INFILE=$1
+  if [[ "$1" =~ ^-h$ ]]; then
+   printf "usage: poptbench infile [iterations [threads [serial|parallel]]]\n"
+   exit 0
+  fi
+else
+  printf "usage: poptbench infile [iterations [threads [serial|parallel]]]\n"
+ exit 1
+fi
+
+if [[ $# -ge 2 ]]; then
+  if [[ "$2" =~ ^[0-9]+$ ]]; then
+    RUNITER=$2
+  else
+    printf "usage: poptbench infile [iterations [threads [serial|parallel]]]\n"
+    printf "error: iterations must be an integer"
+    exit 1
+  fi
+fi
+
+if [[ $# -ge 3 ]]; then
+  if [[ "$3" =~ ^[0-9]+$ ]]; then
+    THREADS=$3
+  else
+    printf "usage: poptbench infile [iterations [threads [serial|parallel]]]\n"
+    printf "error: threads must be an integer\n"
+    exit 1
+  fi
+fi
+
+if [ $# -ge 4 ]; then
+  SERIAL=0
+  PARALLEL=0
+  if [[ "$4" == "serial" ]]; then
+    SERIAL=1
+  else
+    if [[ "$4" == "parallel" ]]; then
+      PARALLEL=1
+    else
+      printf "usage: poptbench infile [iterations [threads [serial|parallel]]]\n"
+      printf '%s\n' "error: option '$4' not allowed"
+      exit 1
+	fi
+  fi
+else
+ SERIAL=1
+ PARALLEL=1
+fi
+
+# OMP directives,number of threads to be used, etc
+export OMP_THREAD_LIMIT=$THREADS
+export OMP_NUM_THREADS=$OMP_THREAD_LIMIT
+export OMP_SCHEDULE=guided
+
+#find the name of the outfile in the parameter estimation report
+line=$(grep -A 1 "name=\"Parameter Estimation" $INFILE)
+# Check if "target=" is present in the result
+if [[ $line == *"target="* ]]; then
+  OUTFILE=$(echo $line | sed 's/.*target="\([^"]*\)".*/\1/')
+fi
+
+#check if variable is empty
+if [[ -z "$OUTFILE" ]]; then
+  #maybe it's in the optimization report?
+  line=$(grep -A 1 "name=\"Optimization" $INFILE)
+  # Check if "target=" is present in the result
+  if [[ $line == *"target="* ]]; then
+    OUTFILE=$(echo $line | sed 's/.*target="\([^"]*\)".*/\1/')
+  fi
+  if [[ -z "$OUTFILE" ]]; then
+    printf "No output file specified, aborting.\n"
+    exit 1
+  else
+    TASK="Optimization"
+  fi
+else
+  TASK="Parameter Estimation"
+fi
+
+printf "started on "
+date
+
+printf '%s\n' "$TASK writing output to $OUTFILE"
+
+# keep a backup of OUTFILE if it exists
+if [[ -e $OUTFILE ]]; then
+  mv $OUTFILE $OUTFILE.bak
+fi
+
+#write a header
+date >> $OUTFILE
+echo "$0 $@" >> $OUTFILE
+grep -m 1  "model name" /proc/cpuinfo >> $OUTFILE
+grep -m 1  "bogomips" /proc/cpuinfo >> $OUTFILE
+grep -m 1  "cpu cores" /proc/cpuinfo >> $OUTFILE
+printf 'threads used\t: %s\n' "$OMP_THREAD_LIMIT" >> $OUTFILE
+printf "\n" >> $OUTFILE
+
+# run the serial version
+if [[ $SERIAL == 1 ]]; then
+  printf '%s' "running serial PS $RUNITER times "
+  printf "SERIAL\n" >> $OUTFILE
+  for ((i=1;i<=$RUNITER;i++));
+  do
+     $OPTSER $CLOPT $INFILE 2>&1 > /dev/null
+ 	 if [ $((i % 10)) -eq 0 ]; then
+       printf "|"
+	 else
+       printf "."
+	 fi
+  done
+
+  # add empty line to report file
+  echo >> $OUTFILE
+  # and to the console
+  echo
+fi
+
+# run the parallel version (the "!" is used to make sure script doesn't abort)
+if [[ $PARALLEL == 1 ]]; then
+  printf '%s' "running parallel PS $RUNITER times "
+  printf 'PARALLEL %d THREADS\n' $THREADS >> $OUTFILE
+  for ((i=1;i<=$RUNITER;i++));
+  do
+     ! $OPTPAR $CLOPT $INFILE 2>&1 > /dev/null
+     if [ $((i % 10)) -eq 0 ]; then
+       printf "|"
+     else
+       printf "."
+     fi
+  done
+fi
+
+printf "\nfinished on "
+date
