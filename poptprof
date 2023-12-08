@@ -1,19 +1,13 @@
 #!/bin/bash
 
-# script to profile CPU usage of COPASI's parallel optimization
-# make sure that the .cps files passed on to this script are set
-# executable for parameter estimation or optimization and that the
-# correct optimization algorithm is selected
+# script to profile CPU usage of CopasiSE
 #
 # depends on audria package https://github.com/scaidermern/audria
 
 # PARAMETERS (edit as needed)
 
-# the executable with serial algorithm
-OPTSER=/usr/bin/CopasiSE
-
-# the executable with parallel algorithm
-OPTPAR=/usr/local/COPASI-DEVEL/bin/CopasiSE
+# the CopasiSE executable to profile
+COPASISE=/usr/local/COPASI-DEVEL/bin/CopasiSE
 
 # COPASI options
 CLOPT="--nologo"
@@ -101,7 +95,7 @@ for ((i=1;i<=$RUNITER;i++));
 do
 #   printf "# " >> $OUTFILE
    printf '%s ' "$i"
-   ! audria -d 0.1 -o $OUTFILE -e $OPTPAR $CLOPT $INFILE 2>&1 > /dev/null
+   ! audria -d 0.1 -o $OUTFILE -e $COPASISE $CLOPT $INFILE 2>&1 > /dev/null
    printf "\n" >> $OUTFILE
 done
 
