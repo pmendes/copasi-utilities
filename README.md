@@ -6,3 +6,6 @@ This repository contains assorted files that are used to work with [COPASI](http
 * **normalize_sequences.pl** - PERL script to convert a report file from COPASI parameter estimation or optimization to a regularly spaced file (in terms of function evaluations). More detailed information in the comments at the top of the file. 
 * **progress_of_fit_stats.pl** - PERL script to calculate statistics on files containing several parameter estimation or optimization results which have been normalized to contain regular intervals (eg processed with *normalize_sequences.pl*). More detailed information in the comments at the top of the file.
 * **run_pe_cps.sh** - BASH script to run a series of repeated COPASI parameter estimations (or optimizations) calculating their statistics. Useful for comparing algorithms. Uses PERL scripts *normalize_sequences.pl* and *progress_of_fit_stats.pl*. More details in the comments at the top of the file. 
+* **poptbench** - BASH script to benchmark a parallel optimization algorithm against the serial version. Requires full path to serial and parallel versions of CopasiSE.
+
+* **poptprof** - BASH script to profile CPU, memory, and I/O features of a CopasiSE run. Requires setting path to CopasiSE executable and uses the [audria](https://github.com/scaidermern/audria) package. Writes out a CSV file with the data of one or several runs.
