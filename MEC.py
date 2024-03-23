@@ -3,6 +3,10 @@
 # MEC.py
 # Model Extender for COPASI
 #
+# THIS CODE HAS BEEN MIGRATED TO "model replicator"
+# https://github.com/copasi/model_replicator
+# TO MAKE A MORE GENERAL TOOL. THIS CODE IS OBSOLETE.
+#
 # This takes a .cps file and replicates it as a set of sub-models
 # which can exist just side-by-side or can be connected in different
 # ways.
